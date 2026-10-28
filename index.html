@@ -13,9 +13,12 @@
   h1 { margin:0; font:400 clamp(2.4rem,9vw,5.5rem)/1 "Iowan Old Style","Palatino Linotype",Georgia,serif; letter-spacing:-.02em; }
   header p { margin:.75rem 0 0; color:var(--mute); }
   main { padding:0 clamp(1rem,4vw,3rem) 4rem; }
-  .gallery { column-width:280px; column-gap:10px; }
-  .gallery button { display:block; width:100%; margin:0 0 10px; padding:0; border:0; background:none; cursor:zoom-in; break-inside:avoid; }
+  /* Rows of photos fill the full width; each photo keeps its own shape. --h is the target row height. */
+  .gallery { --h:300px; display:flex; flex-wrap:wrap; gap:10px; }
+  .gallery::after { content:""; flex-grow:1000000; }
+  .gallery button { --r:1.5; flex:calc(var(--r) * 100) 1 calc(var(--r) * var(--h)); margin:0; padding:0; border:0; background:none; cursor:zoom-in; }
   .gallery img { display:block; width:100%; height:auto; background:rgba(128,128,128,.15); }
+  @media (max-width:600px) { .gallery { --h:180px; gap:6px; } }
   button:focus-visible { outline:3px solid currentColor; outline-offset:2px; }
   .msg { color:var(--mute); max-width:60ch; }
   #box { position:fixed; inset:0; background:var(--veil); display:none; align-items:center; justify-content:center; flex-direction:column; padding:3rem 1rem 4rem; color:#e8ecec; z-index:10; }
@@ -43,7 +46,7 @@
 </div>
 
 <script>
-// EDIT THESE TWO LINES: your GitHub username and the name of the repo holding this site.
+// GitHub username/repo that holds this site.
 const REPO = "Starkoz-mp3/Photos";
 const FOLDER = "images";
 
@@ -62,7 +65,11 @@ fetch(`https://api.github.com/repos/${REPO}/contents/${FOLDER}`)
     photos.forEach((name, n) => {
       const b = document.createElement("button");
       b.setAttribute("aria-label", "Open photo " + (nice(name) || n + 1));
-      b.innerHTML = `<img src="${FOLDER}/${encodeURIComponent(name)}" loading="lazy" decoding="async" alt="${nice(name)}">`;
+      b.innerHTML = `<img src="${FOLDER}/${encodeURIComponent(name)}" decoding="async" alt="${nice(name)}">`;
+      const im = b.firstChild;
+      const setShape = () => { if (im.naturalHeight) b.style.setProperty("--r", im.naturalWidth / im.naturalHeight); };
+      im.onload = setShape;
+      if (im.complete) setShape();
       b.onclick = () => show(n, b);
       gal.appendChild(b);
     });
