@@ -20,7 +20,7 @@ const ls = async p => {
 // Albums page: one tile per folder inside images/. Cover = cover.* if present, else the first photo.
 const A = document.getElementById("albums");
 if (A) ls(ROOT)
-  .then(l => Promise.all(l.filter(f => f.type === "dir").map(async f => {
+  .then(l => Promise.all(l.filter(f => f.type === "dir" && f.name !== "highlights").map(async f => {
     const n = pics(await ls(`${ROOT}/${f.name}`));
     return { dir: f.name, cover: n.find(x => /^cover\./i.test(x)) || n[0] };
   })))
