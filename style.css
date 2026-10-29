@@ -10,7 +10,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset
 .nav .here{border-bottom:1px solid currentColor}
 .hero{position:relative;height:100vh;height:100svh;min-height:420px;display:flex;flex-direction:column;justify-content:flex-end;padding:var(--pad);background:#000 url(images/hero.jpg) 50% 45%/cover no-repeat}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent 55%)}
-.hero h1{position:relative;margin:0;font-weight:700;font-size:clamp(3.5rem,11vw,10rem);line-height:.85;letter-spacing:-.05em}
+.hero h1{position:relative;margin:0;font-weight:700;font-size:clamp(3.5rem,16vw,13rem);line-height:.85;letter-spacing:-.05em}
 .hero a.go{position:relative;margin-top:1.25rem;color:#cfcfcf;border-bottom:1px solid currentColor;align-self:flex-start}
 .page{padding:clamp(5rem,12vw,7rem) var(--pad) 4rem}
 .title{margin:0 0 2rem;font-weight:700;font-size:clamp(2.5rem,9vw,6rem);line-height:.95;letter-spacing:-.04em}
@@ -34,3 +34,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset
 #prev{left:0}#next{right:0}
 #close{position:absolute;top:.5rem;right:.75rem;border:0;background:none;color:inherit;font-size:2rem;padding:.5rem 1rem;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.tile img{transition:none}}
+.sec{padding:clamp(3rem,9vw,6rem) var(--pad) 0}
+.sec h2,.band h2{margin:0 0 1.5rem;font-weight:700;font-size:clamp(2rem,7vw,4.5rem);line-height:.95;letter-spacing:-.04em}
+.more{display:inline-block;margin-top:1.5rem;color:var(--mute);border-bottom:1px solid currentColor}
+.more:hover{color:var(--ink)}
+.band{margin-top:clamp(3rem,9vw,6rem);padding:clamp(3rem,9vw,6rem) var(--pad);background:#171717}
+.band h2{font-size:clamp(3rem,12vw,9rem)}
+.lede{margin:0;max-width:34ch;font-size:clamp(1.1rem,2.2vw,1.5rem);line-height:1.4;color:#bdbdbd}
+.about{display:grid;gap:1rem 3rem;grid-template-columns:1fr}
+.about h2{margin:0}
+@media (min-width:800px){.about{grid-template-columns:1fr 2fr}}
+.foot{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;padding:clamp(3rem,9vw,6rem) var(--pad) 2rem;color:var(--mute);font-size:.95rem}
+.foot a:hover{color:var(--ink)}

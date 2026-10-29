@@ -3,6 +3,8 @@ const REPO = "Starkoz-mp3/Photos", ROOT = "images", IMG = /\.(jpe?g|png|webp|avi
 const nice = s => { s = s.replace(/\.[^.]+$/, "").replace(/^[\d\s_-]+/, "").replace(/[-_]+/g, " ").trim(); return s.charAt(0).toUpperCase() + s.slice(1); };
 const enc = (...p) => p.map(encodeURIComponent).join("/");
 const say = (el, t) => { el.innerHTML = `<p class="msg">${t}</p>`; };
+// On the home page a section with data-hide quietly disappears when it has nothing to show.
+const none = (el, t) => el.hasAttribute("data-hide") ? el.closest("section").remove() : say(el, t);
 const pics = l => l.filter(f => f.type === "file" && IMG.test(f.name)).map(f => f.name)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 const ls = async p => {
@@ -24,7 +26,7 @@ if (A) ls(ROOT)
   })))
   .then(a => {
     a = a.filter(x => x.cover);
-    if (!a.length) return say(A, "No albums yet. Add a folder of photos inside images.");
+    if (!a.length) return none(A, "No albums yet. Add a folder of photos inside images.");
     a.forEach(x => {
       const t = document.createElement("a");
       t.className = "tile"; t.href = x.dir + ".html";
@@ -32,7 +34,7 @@ if (A) ls(ROOT)
       A.appendChild(t);
     });
   })
-  .catch(() => say(A, "Couldn’t load the albums. Check the repo name at the top of site.js."));
+  .catch(() => none(A, "Couldn’t load the albums. Check the repo name at the top of site.js."));
 
 // Album page: justified rows of every photo in images/<album>/, with a viewer.
 const G = document.getElementById("gallery");
@@ -67,8 +69,8 @@ if (G) {
     if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1));
   });
   ls(`${ROOT}/${dir}`).then(l => {
-    names = pics(l);
-    if (!names.length) return say(G, "No photos in this album yet.");
+    names = pics(l).slice(0, +G.dataset.max || undefined);
+    if (!names.length) return none(G, "No photos in this album yet.");
     names.forEach((n, k) => {
       const b = document.createElement("button");
       b.setAttribute("aria-label", "Open photo " + (nice(n) || k + 1));
@@ -79,6 +81,13 @@ if (G) {
       b.onclick = () => show(k, b);
       G.appendChild(b);
     });
-  }).catch(() => say(G, "Couldn’t load this album. Check the folder name and the repo name in site.js."));
+  }).catch(() => none(G, "Couldn’t load this album. Check the folder name and the repo name in site.js."));
 }
+
+// Footer on every page. Put your Instagram handle in INSTA (e.g. "stankozik"); empty hides the link.
+const INSTA = "", EMAIL = "stan@stankozik.org";
+const foot = document.createElement("footer");
+foot.className = "foot";
+foot.innerHTML = `<a href="mailto:${EMAIL}">${EMAIL}</a>${INSTA ? `<a href="https://instagram.com/${INSTA}" target="_blank" rel="noopener">Instagram</a>` : ""}<span>© ${new Date().getFullYear()} Stan Kozik</span>`;
+document.body.appendChild(foot);
 })();
