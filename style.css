@@ -10,7 +10,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset
 .nav .here{border-bottom:1px solid currentColor}
 .hero{position:relative;height:100vh;height:100svh;min-height:420px;display:flex;flex-direction:column;justify-content:flex-end;padding:var(--pad);background:#000 url(images/hero.jpg) 50% 45%/cover no-repeat}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent 55%)}
-.hero h1{position:relative;margin:0;font-weight:700;font-size:clamp(3.5rem,11vw,10rem);line-height:.85;letter-spacing:-.05em}
+.hero h1{position:relative;margin:0;font-weight:700;font-size:clamp(3.5rem,16vw,13rem);line-height:.85;letter-spacing:-.05em}
 .hero a.go{position:relative;margin-top:1.25rem;color:#cfcfcf;border-bottom:1px solid currentColor;align-self:flex-start}
 .page{padding:clamp(5rem,12vw,7rem) var(--pad) 4rem}
 .title{margin:0 0 2rem;font-weight:700;font-size:clamp(2.5rem,9vw,6rem);line-height:.95;letter-spacing:-.04em}
@@ -46,3 +46,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset
 @media (min-width:800px){.about{grid-template-columns:1fr 2fr}}
 .foot{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;padding:clamp(3rem,9vw,6rem) var(--pad) 2rem;color:var(--mute);font-size:.95rem}
 .foot a:hover{color:var(--ink)}
+.gallery.flush::after{display:none}
+.gallery.stack button{flex:1 1 100%}
+button.more{padding:0;border:0;border-bottom:1px solid currentColor;background:none;font:inherit;cursor:pointer}
+.more[hidden]{display:none}

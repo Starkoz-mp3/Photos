@@ -68,19 +68,73 @@ if (G) {
     const dx = e.changedTouches[0].clientX - x0; x0 = null;
     if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1));
   });
+  const src = n => enc(ROOT, dir, n);
+  const ratios = {};
+  const makeBtn = k => {
+    const n = names[k], b = document.createElement("button");
+    b.setAttribute("aria-label", "Open photo " + (nice(n) || k + 1));
+    b.innerHTML = `<img src="${src(n)}" decoding="async" alt="${nice(n)}">`;
+    if (ratios[k]) b.style.setProperty("--r", ratios[k]);
+    const im = b.firstChild;
+    const shape = () => { if (im.naturalHeight) b.style.setProperty("--r", ratios[k] = im.naturalWidth / im.naturalHeight); };
+    im.onload = shape; if (im.complete) shape();
+    b.onclick = () => show(k, b);
+    return b;
+  };
+
+  // Highlights preview (data-preview): a flush row or two of 3 to 8 photos, one per row on phones,
+  // with a See more button that expands the rest in place.
+  const preview = () => {
+    const head = Math.min(names.length, 8);
+    let open = false, lastW = 0;
+    const btn = document.createElement("button");
+    btn.className = "more"; G.after(btn);
+    const pick = (W, gap, h) => {
+      if (head <= 3) return head;
+      const maxRows = W >= 1000 ? 2 : 1;
+      let best = 0, bestFill = 0, fallback = 0;
+      for (let K = 3; K <= head; K++) {
+        let rows = 1, w = 0;
+        for (let i = 0; i < K; i++) {
+          const bw = ratios[i] * h;
+          if (w && w + gap + bw > W) { rows++; w = bw; } else w += (w ? gap : 0) + bw;
+        }
+        const fill = w / W;
+        if (rows <= maxRows && fill >= .75) best = K;
+        if (rows <= maxRows && fill > bestFill) { bestFill = fill; fallback = K; }
+      }
+      return best || fallback || 3;
+    };
+    const render = () => {
+      const W = lastW = G.clientWidth, stack = W < 600, gap = stack ? 6 : 10, h = W < 900 ? 220 : 300;
+      G.style.setProperty("--h", h + "px");
+      G.classList.toggle("stack", stack);
+      G.classList.toggle("flush", !open);
+      const K = open ? names.length : (stack ? Math.min(3, head) : pick(W, gap, h));
+      G.textContent = "";
+      for (let k = 0; k < K; k++) G.appendChild(makeBtn(k));
+      btn.hidden = names.length <= K && !open;
+      btn.textContent = open ? "Show less" : "See more";
+    };
+    btn.onclick = () => {
+      open = !open; render();
+      if (!open) G.closest("section").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    };
+    let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (G.clientWidth !== lastW) render(); }, 150); });
+    // Learn the shapes of the first few photos so the preview can be laid out flush.
+    Promise.all(names.slice(0, head).map((n, k) => new Promise(done => {
+      const im = new Image();
+      im.onload = () => { ratios[k] = im.naturalWidth / im.naturalHeight; done(); };
+      im.onerror = () => { ratios[k] = 1.5; done(); };
+      im.src = src(n);
+    }))).then(render);
+  };
+
   ls(`${ROOT}/${dir}`).then(l => {
     names = pics(l).slice(0, +G.dataset.max || undefined);
     if (!names.length) return none(G, "No photos in this album yet.");
-    names.forEach((n, k) => {
-      const b = document.createElement("button");
-      b.setAttribute("aria-label", "Open photo " + (nice(n) || k + 1));
-      b.innerHTML = `<img src="${enc(ROOT, dir, n)}" decoding="async" alt="${nice(n)}">`;
-      const im = b.firstChild;
-      const shape = () => { if (im.naturalHeight) b.style.setProperty("--r", im.naturalWidth / im.naturalHeight); };
-      im.onload = shape; if (im.complete) shape();
-      b.onclick = () => show(k, b);
-      G.appendChild(b);
-    });
+    if (G.hasAttribute("data-preview")) return preview();
+    names.forEach((n, k) => G.appendChild(makeBtn(k)));
   }).catch(() => none(G, "Couldn’t load this album. Check the folder name and the repo name in site.js."));
 }
 
